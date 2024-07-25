@@ -32,8 +32,10 @@ class Pago(models.Model):
 class GeoreferenciaInmueble(models.Model):
     idgeoreferencia = models.AutoField(primary_key=True)
     numero_inmueble = models.ForeignKey(Inmueble, on_delete=models.CASCADE)
+    
     latitud = models.FloatField()
     longitud = models.FloatField()
+
     altitud = models.FloatField()
 
     def __str__(self):

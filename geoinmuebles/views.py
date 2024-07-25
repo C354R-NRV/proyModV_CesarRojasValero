@@ -1,8 +1,12 @@
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import GeoreferenciaInmueble
+from .models import GeoreferenciaInmueble, Inmueble
 from .serializers import GeoreferenciaInmuebleSerializer
+
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from geopy.geocoders import Nominatim
 
 class GeoreferenciaInmuebleViewSet(viewsets.ModelViewSet):
     queryset = GeoreferenciaInmueble.objects.all()
@@ -31,3 +35,25 @@ class GeoreferenciaInmuebleZonaEspecificaViewSet(viewsets.ReadOnlyModelViewSet):
         if zona is not None:
             return GeoreferenciaInmueble.objects.filter(numero_inmueble__especificaciontecnica__zona_clasificacion=zona)
         return GeoreferenciaInmueble.objects.all()
+    
+def geocode_inmueble(request, numero_inmueble):
+    inmueble = get_object_or_404(Inmueble, numero_inmueble=numero_inmueble)
+    geolocator = Nominatim(user_agent="geoinmueble_app")
+    #location = geolocator.geocode(f"{inmueble.direccion}, La Paz, Bolivia")
+    location = geolocator.geocode(inmueble.direccion)
+    
+    if location:
+        georeferencia, created = GeoreferenciaInmueble.objects.get_or_create(numero_inmueble=inmueble)
+        georeferencia.latitud = location.latitude
+        georeferencia.longitud = location.longitude
+        georeferencia.save()
+        
+        response = {
+            'numero_inmueble': inmueble.numero_inmueble,
+            'direccion': inmueble.direccion,
+            'latitud': georeferencia.latitud,
+            'longitud': georeferencia.longitud,
+        }
+        return JsonResponse(response)
+    else:
+        return JsonResponse({"error": "Direccion no encontrada ["+inmueble.direccion+"]"}, status=404)

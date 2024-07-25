@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import GeoreferenciaInmuebleViewSet, georeferencias_altitud_mayor, \
-    GeoreferenciaInmuebleAltitudMinimaViewSet, GeoreferenciaInmuebleZonaEspecificaViewSet
+    GeoreferenciaInmuebleAltitudMinimaViewSet, GeoreferenciaInmuebleZonaEspecificaViewSet, geocode_inmueble
 
 router = DefaultRouter()
 router.register(r'georeferencias', GeoreferenciaInmuebleViewSet) 
@@ -11,4 +11,5 @@ router.register(r'georeferencias-zona-especifica', GeoreferenciaInmuebleZonaEspe
 urlpatterns = [
     path('', include(router.urls)),
     path('georeferencias/altitud_mayor/<int:altitud>/', georeferencias_altitud_mayor),
+    path('geocode/<str:numero_inmueble>/', geocode_inmueble, name='geocode_inmueble'),
 ]

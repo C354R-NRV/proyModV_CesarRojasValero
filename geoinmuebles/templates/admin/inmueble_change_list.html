@@ -1,0 +1,10 @@
+<!-- templates/admin/inmueble_change_list.html -->
+
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+{{ block.super }}
+<li>
+    <a class="addlink" href="{% url 'admin:geocode_inmueble' numero_inmueble=inmueble.numero_inmueble %}">Geocodificar</a>
+</li>
+{% endblock %}
